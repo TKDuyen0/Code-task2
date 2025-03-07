@@ -3,10 +3,12 @@ from tensorflow.keras import layers, models  # Import các lớp cần thiết t
 from sklearn.metrics import classification_report, confusion_matrix  # Dùng để đánh giá mô hình
 from sklearn.model_selection import train_test_split  # Dùng để chia tách dữ liệu thành tập huấn luyện và kiểm tra
 import numpy as np  # Thư viện hỗ trợ tính toán với mảng số
+import matplotlib.pyplot as plt  # Dùng để vẽ biểu đồ
+import seaborn as sns  # Thư viện hiển thị biểu đồ heatmap
 
 def generate_time_series_data(n_samples=2000, timesteps=100, noise_amp=1.5):
     """
-    Hàm tạo dữ liệu chuỗi thời gian với nhiễu ngẫu nhiên.
+    Tạo dữ liệu chuỗi thời gian với nhiễu ngẫu nhiên.
     
     Args:
         n_samples (int): Số lượng mẫu dữ liệu cần tạo.
@@ -38,9 +40,9 @@ def generate_time_series_data(n_samples=2000, timesteps=100, noise_amp=1.5):
 
 def run_time_series():
     """
-    Hàm thực hiện quy trình: tạo dữ liệu, chia tách dữ liệu, xây dựng, huấn luyện và đánh giá mô hình.
+    Sinh dữ liệu, xây dựng, huấn luyện, đánh giá mô hình và hiển thị ma trận nhầm lẫn.
     """
-    # Tạo dữ liệu chuỗi thời gian
+    # Sinh dữ liệu chuỗi thời gian
     X, y = generate_time_series_data(n_samples=2000, timesteps=100, noise_amp=1.5)
     
     # Chia dữ liệu thành tập huấn luyện (80%) và tập kiểm tra (20%)
@@ -76,13 +78,22 @@ def run_time_series():
     # Chuyển xác suất dự đoán thành nhãn 0 hoặc 1 với ngưỡng 0.5
     y_pred_labels = (y_pred > 0.5).astype("int32").flatten()
     
-    # In báo cáo phân loại bao gồm các chỉ số precision, recall, f1-score cho mỗi lớp
+    # In báo cáo phân loại chi tiết
     print("\nClassification Report (Modified Time Series):")
     print(classification_report(y_test, y_pred_labels))
     
-    # In ma trận nhầm lẫn để xem số lượng dự đoán đúng và sai theo từng lớp
+    # Tính toán và in ma trận nhầm lẫn
     print("Confusion Matrix (Modified Time Series):")
-    print(confusion_matrix(y_test, y_pred_labels))
+    cm = confusion_matrix(y_test, y_pred_labels)
+    print(cm)
+    
+    # Vẽ biểu đồ ma trận nhầm lẫn sử dụng seaborn
+    plt.figure(figsize=(6, 4))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+    plt.title("Ma trận nhầm lẫn (Modified Time Series)")
+    plt.xlabel("Nhãn dự đoán")
+    plt.ylabel("Nhãn thực tế")
+    plt.show()
 
 # Nếu file được chạy trực tiếp thì thực hiện hàm run_time_series
 if __name__ == '__main__':
